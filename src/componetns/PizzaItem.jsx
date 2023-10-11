@@ -1,26 +1,43 @@
-function PizzaItem({price}) {
+import { useState } from "react";
+
+function PizzaItem({ price, title, imageUrl, sizes, types }) {
+  const [count, setCount] = useState(0);
+  const typeNames = ["Thin", "Traditionale"];
+  const [activeType, setActiveType] = useState(0);
+  const [activeSize, setActiveSize] = useState(0);
+
   return (
-    <div class="pizza-block">
-      <img
-        class="pizza-block__image"
-        src="https://dodopizza-a.akamaihd.net/static/Img/Products/Pizza/ru-RU/b750f576-4a83-48e6-a283-5a8efb68c35d.jpg"
-        alt="Pizza"
-      />
-      <h4 class="pizza-block__title">Чизбургер-пицца</h4>
-      <div class="pizza-block__selector">
+    <div className="pizza-block">
+      <img className="pizza-block__image" src={imageUrl} alt="Pizza" />
+      <h4 className="pizza-block__title">{title}</h4>
+      <div className="pizza-block__selector">
         <ul>
-          <li class="active">тонкое</li>
-          <li>традиционное</li>
+          {types.map((type, index) => (
+            <li
+              className={activeType === type ? "active" : ""}
+              onClick={() => setActiveType(index)}
+            >
+              {typeNames[type]}
+            </li>
+          ))}
         </ul>
         <ul>
-          <li class="active">26 см.</li>
-          <li>30 см.</li>
-          <li>40 см.</li>
+          {sizes.map((size, index) => (
+            <li
+              className={activeSize === index ? "active" : ""}
+              onClick={() => setActiveSize(index)}
+            >
+              {size} sm.
+            </li>
+          ))}
         </ul>
       </div>
-      <div class="pizza-block__bottom">
-        <div class="pizza-block__price">от {price} ₴</div>
-        <div class="button button--outline button--add">
+      <div className="pizza-block__bottom">
+        <div className="pizza-block__price">от {price} ₴</div>
+        <button
+          className="button button--outline button--add"
+          onClick={() => setCount(count + 1)}
+        >
           <svg
             width="12"
             height="12"
@@ -34,8 +51,8 @@ function PizzaItem({price}) {
             />
           </svg>
           <span>Добавить</span>
-          <i>2</i>
-        </div>
+          <i>{count}</i>
+        </button>
       </div>
     </div>
   );

@@ -14,6 +14,7 @@ function PizzaItem({ price, title, imageUrl, sizes, types }) {
         <ul>
           {types.map((type, index) => (
             <li
+              key={index}
               className={activeType === type ? "active" : ""}
               onClick={() => setActiveType(index)}
             >
@@ -24,6 +25,7 @@ function PizzaItem({ price, title, imageUrl, sizes, types }) {
         <ul>
           {sizes.map((size, index) => (
             <li
+              key={index}
               className={activeSize === index ? "active" : ""}
               onClick={() => setActiveSize(index)}
             >
@@ -33,7 +35,7 @@ function PizzaItem({ price, title, imageUrl, sizes, types }) {
         </ul>
       </div>
       <div className="pizza-block__bottom">
-        <div className="pizza-block__price">от {price} ₴</div>
+        <div className="pizza-block__price">from {price} ₴</div>
         <button
           className="button button--outline button--add"
           onClick={() => setCount(count + 1)}

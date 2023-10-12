@@ -8,6 +8,7 @@ import pizzas from "../assets/pizza.json";
 const Home = () => {
   return (
     <>
+    <div className="container"> 
       <div className="content__top">
         <Categories />
         <Sort />
@@ -17,6 +18,7 @@ const Home = () => {
         {pizzas.map((obj) => (
           <PizzaItem key={obj.id} {...obj} />
         ))}
+      </div>
       </div>
     </>
   );

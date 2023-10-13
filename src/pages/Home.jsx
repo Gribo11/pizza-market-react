@@ -1,5 +1,5 @@
 import React from "react";
-
+import axios from "axios";
 import Categories from "../componetns/Categories";
 import Sort from "../componetns/Sort";
 import PizzaItem from "../componetns/PizzaItem";
@@ -7,41 +7,48 @@ import Skeleton from "../componetns/PizzaItem/Skeleton";
 import Pagination from "../componetns/Pagination";
 import { SearchContext } from "../App";
 
+import { useSelector, useDispatch } from "react-redux";
+import { setCategoryId, setCurrentPage } from "../redux/slices/filterSlice";
+
 const Home = () => {
-  const { searchValue } = React.useContext(SearchContext); 
+  const { categoryId, sort, currentPage } = useSelector((state) => state.filter);
+  const sortType = sort.type;
+  const dispatch = useDispatch();
+
+  const { searchValue } = React.useContext(SearchContext);
   const [items, setItems] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
-  const [categoryId, setCategoryId] = React.useState(0);
-  const [sortType, setSortType] = React.useState({
-    name: "Popular",
-    type: "rating",
-  });
-  const [currentPage, setCurrentPage] = React.useState(1);
-  const category = categoryId > 0 ? `category=${categoryId}` : "";
-  const search = searchValue ? `&search=${searchValue}` : "";
+
+  const onChangeCategory = (id) => {
+    dispatch(setCategoryId(id));
+  };
+
+  const onChangePage = (number) => {
+    dispatch(setCurrentPage(number));
+  };
 
   React.useEffect(() => {
     setIsLoading(true);
-    fetch(
-      `https://65279571917d673fd76dda40.mockapi.io/items?page=${currentPage}&limit=4${category}&sortBy=${sortType.type}&order=desc${search}`
-    )
-      .then((res) => res.json())
-      .then((arr) => {
-        setItems(arr);
+    const category = categoryId > 0 ? `category=${categoryId}` : "";
+    const search = searchValue ? `&search=${searchValue}` : "";
+
+    window.scrollTo(0, 0);
+    axios
+      .get(
+        `https://65279571917d673fd76dda40.mockapi.io/items?page=${currentPage}&limit=4&${category}&sortBy=${sortType.type}&order=desc${search}`
+      )
+      .then((res) => {
+        setItems(res.data);
         setIsLoading(false);
       });
-    window.scrollTo(0, 0);
   }, [categoryId, sortType, searchValue, currentPage]);
 
   return (
     <>
       <div className="container">
         <div className="content__top">
-          <Categories
-            value={categoryId}
-            onClickCategory={(index) => setCategoryId(index)}
-          />
-          <Sort value={sortType} onChangeSort={(index) => setSortType(index)} />
+          <Categories value={categoryId} onClickCategory={onChangeCategory} />
+          <Sort />
         </div>
         <h2 className="content__title">All pizzas</h2>
         <div className="content__items">
@@ -49,7 +56,7 @@ const Home = () => {
             ? [...new Array(6)].map((_, index) => <Skeleton key={index} />)
             : items.map((obj) => <PizzaItem key={obj.id} {...obj} />)}
         </div>
-        <Pagination onChangePage={(number) => setCurrentPage(number)} />
+        <Pagination currentPage={currentPage} onChangePage={onChangePage} />
       </div>
     </>
   );

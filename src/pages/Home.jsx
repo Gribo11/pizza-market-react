@@ -5,8 +5,10 @@ import Sort from "../componetns/Sort";
 import PizzaItem from "../componetns/PizzaItem";
 import Skeleton from "../componetns/PizzaItem/Skeleton";
 import Pagination from "../componetns/Pagination";
+import { SearchContext } from "../App";
 
-const Home = ({ searchValue }) => {
+const Home = () => {
+  const { searchValue } = React.useContext(SearchContext); 
   const [items, setItems] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [categoryId, setCategoryId] = React.useState(0);
@@ -47,7 +49,7 @@ const Home = ({ searchValue }) => {
             ? [...new Array(6)].map((_, index) => <Skeleton key={index} />)
             : items.map((obj) => <PizzaItem key={obj.id} {...obj} />)}
         </div>
-        <Pagination onChangePage={(number)=>setCurrentPage(number)}/>
+        <Pagination onChangePage={(number) => setCurrentPage(number)} />
       </div>
     </>
   );

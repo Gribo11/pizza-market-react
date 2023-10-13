@@ -1,13 +1,15 @@
 import { useState } from "react";
 
-function Sort() {
+function Sort({ value, onChangeSort }) {
   const [open, setOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const sortList = ["Popular", "Price", "A-z"];
-  const SortName = sortList[activeIndex];
+  const sortList = [
+    { name: "Popular", type: "rating" },
+    { name: "Price", type: "price" },
+    { name: "A-z", type: "title" },
+  ];
 
   const onClickSort = (index) => {
-    setActiveIndex(index);
+    onChangeSort(index);
     setOpen(false);
   };
 
@@ -27,7 +29,7 @@ function Sort() {
           />
         </svg>
         <b>Sort by:</b>
-        <span onClick={() => setOpen(!open)}>{SortName}</span>
+        <span onClick={() => setOpen(!open)}>{value.name}</span>
       </div>
       {open && (
         <div className="sort__popup">
@@ -35,11 +37,11 @@ function Sort() {
             {sortList.map((item, index) => {
               return (
                 <li
-                  className={activeIndex === index ? "active" : ""}
-                  onClick={() => onClickSort(index)}
+                  className={value.type === item.type ? "active" : ""}
+                  onClick={() => onClickSort(item)}
                   key={index}
                 >
-                  {item}
+                  {item.name}
                 </li>
               );
             })}

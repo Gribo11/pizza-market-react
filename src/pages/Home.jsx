@@ -1,19 +1,31 @@
 import React from "react";
 import axios from "axios";
+import qs from "qs";
 import Categories from "../componetns/Categories";
-import Sort from "../componetns/Sort";
+import Sort, { sortList } from "../componetns/Sort";
 import PizzaItem from "../componetns/PizzaItem";
 import Skeleton from "../componetns/PizzaItem/Skeleton";
 import Pagination from "../componetns/Pagination";
 import { SearchContext } from "../App";
-
+import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { setCategoryId, setCurrentPage } from "../redux/slices/filterSlice";
+import {
+  setCategoryId,
+  setCurrentPage,
+  setFilters,
+} from "../redux/slices/filterSlice";
 
 const Home = () => {
-  const { categoryId, sort, currentPage } = useSelector((state) => state.filter);
-  const sortType = sort.type;
+  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const isSearch = React.useRef(false);
+  const isMounted = React.useRef(false);
+
+  const { categoryId, sort, currentPage } = useSelector(
+    (state) => state.filter
+  );
+
+  const sortType = sort.type;
 
   const { searchValue } = React.useContext(SearchContext);
   const [items, setItems] = React.useState([]);
@@ -27,7 +39,7 @@ const Home = () => {
     dispatch(setCurrentPage(number));
   };
 
-  React.useEffect(() => {
+  const fetchData = () => {
     setIsLoading(true);
     const category = categoryId > 0 ? `category=${categoryId}` : "";
     const search = searchValue ? `&search=${searchValue}` : "";
@@ -41,7 +53,42 @@ const Home = () => {
         setItems(res.data);
         setIsLoading(false);
       });
+  };
+
+  React.useEffect(() => {
+    if (window.location.search) {
+      const params = qs.parse(window.location.search.substring(1));
+      const sort = sortList.find((obj) => obj.type === params.sortType);
+      dispatch(
+        setFilters({
+          ...params,
+          sort,
+        })
+      );
+      isSearch.current = true;
+    }
+  }, []);
+
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+    if (!isSearch.current) {
+      fetchData();
+    }
+
+    isSearch.current = false;
   }, [categoryId, sortType, searchValue, currentPage]);
+
+  React.useEffect(() => {
+    if (isMounted.current) {
+      const QueryString = qs.stringify({
+        sortType,
+        categoryId,
+        currentPage,
+      });
+      navigate(`?${QueryString}`);
+    }
+    isMounted.current = true;
+  }, [categoryId, sortType, currentPage]);
 
   return (
     <>

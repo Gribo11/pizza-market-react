@@ -10,10 +10,12 @@ import { SearchContext } from "../App";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
+  selectFilter,
   setCategoryId,
   setCurrentPage,
   setFilters,
 } from "../redux/slices/filterSlice";
+import { fetchPizzas, seelctPizza } from "../redux/slices/pizzasSlice";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -21,15 +23,9 @@ const Home = () => {
   const isSearch = React.useRef(false);
   const isMounted = React.useRef(false);
 
-  const { categoryId, sort, currentPage } = useSelector(
-    (state) => state.filter
-  );
-
+  const { categoryId, sort, currentPage, searchValue } = useSelector(selectFilter);
+  const { items, status } = useSelector(seelctPizza);
   const sortType = sort.type;
-
-  const { searchValue } = React.useContext(SearchContext);
-  const [items, setItems] = React.useState([]);
-  const [isLoading, setIsLoading] = React.useState(true);
 
   const onChangeCategory = (id) => {
     dispatch(setCategoryId(id));
@@ -39,20 +35,19 @@ const Home = () => {
     dispatch(setCurrentPage(number));
   };
 
-  const fetchData = () => {
-    setIsLoading(true);
+  const fetchData = async () => {
     const category = categoryId > 0 ? `category=${categoryId}` : "";
     const search = searchValue ? `&search=${searchValue}` : "";
+    dispatch(
+      fetchPizzas({
+        category,
+        sortType,
+        currentPage,
+        search,
+      })
+    );
 
     window.scrollTo(0, 0);
-    axios
-      .get(
-        `https://65279571917d673fd76dda40.mockapi.io/items?page=${currentPage}&limit=4&${category}&sortBy=${sortType.type}&order=desc${search}`
-      )
-      .then((res) => {
-        setItems(res.data);
-        setIsLoading(false);
-      });
   };
 
   React.useEffect(() => {
@@ -89,6 +84,10 @@ const Home = () => {
     }
     isMounted.current = true;
   }, [categoryId, sortType, currentPage]);
+  const skeletons = [...new Array(6)].map((_, index) => (
+    <Skeleton key={index} />
+  ));
+  const pizzas = items.map((obj) => <PizzaItem key={obj.id} {...obj} />);
 
   return (
     <>
@@ -99,9 +98,19 @@ const Home = () => {
         </div>
         <h2 className="content__title">All pizzas</h2>
         <div className="content__items">
-          {isLoading
-            ? [...new Array(6)].map((_, index) => <Skeleton key={index} />)
-            : items.map((obj) => <PizzaItem key={obj.id} {...obj} />)}
+          {status === "error" ? (
+            <div className="content__error-info">
+              <h2>There was an error 😕</h2>
+              <p>
+                Unfortunately, it was not possible to retrieve the pits. Please
+                try again later.
+              </p>
+            </div>
+          ) : (
+            <div className="content__items">
+              {status === "loading" ? skeletons : pizzas}
+            </div>
+          )}
         </div>
         <Pagination currentPage={currentPage} onChangePage={onChangePage} />
       </div>

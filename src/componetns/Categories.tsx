@@ -2,13 +2,12 @@ import { useState } from "react";
 
 type CategoriesProps = {
   value: number;
-  onClickCategory: any;
+  onClickCategory: (index: number) => void;
 };
 
-const Categories: React.FC<CategoriesProps> = ({ value, onClickCategory }) => {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const categories = ["All", "Meat", "Vegetarian", "Grill", "Sharp", "Closed"];
+const categories = ["All", "Meat", "Vegetarian", "Grill", "Sharp", "Closed"];
 
+const Categories: React.FC<CategoriesProps> = ({ value, onClickCategory }) => {
   return (
     <div className="categories">
       <ul>

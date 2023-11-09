@@ -26,8 +26,8 @@ function Sort() {
   };
 
   React.useEffect(() => {
-    const hadleClickOutside = (event: any) => {
-      if (!event.composedPath().includes(sortRef.current)) {
+    const hadleClickOutside = (event: MouseEvent) => {
+      if (sortRef.current && !event.composedPath().includes(sortRef.current)) {
         setOpen(false);
       }
     };

@@ -13,7 +13,11 @@ import {
   setCurrentPage,
   setFilters,
 } from "../redux/slices/filterSlice";
-import { fetchPizzas, seelctPizza } from "../redux/slices/pizzasSlice";
+import {
+  fetchPizzas,
+  SearchPizzaParams,
+  seelctPizza,
+} from "../redux/slices/pizzasSlice";
 import { useAppDispatch } from "../redux/store";
 
 const Home: React.FC = () => {
@@ -52,12 +56,16 @@ const Home: React.FC = () => {
 
   React.useEffect(() => {
     if (window.location.search) {
-      const params = qs.parse(window.location.search.substring(1));
-      const sort = sortList.find((obj) => obj.type === params.sortType);
+      const params = qs.parse(
+        window.location.search.substring(1)
+      ) as unknown as SearchPizzaParams;
+      const sortObj = sortList.find((obj) => obj.type === params.sortType);
       dispatch(
         setFilters({
-          ...params,
-          sort,
+          searchValue: params.search,
+          categoryId: Number(params.category),
+          currentPage: Number(params.currentPage),
+          sort: sortObj || sortList[0],
         })
       );
       isSearch.current = true;

@@ -31,9 +31,9 @@ const Home: React.FC = () => {
   const { items, status } = useSelector(seelctPizza);
   const sortType = sort.type;
 
-  const onChangeCategory = (id: number) => {
+  const onChangeCategory = React.useCallback((id: number) => {
     dispatch(setCategoryId(id));
-  };
+  }, []);
 
   const onChangePage = (number: number) => {
     dispatch(setCurrentPage(number));
@@ -102,7 +102,7 @@ const Home: React.FC = () => {
       <div className="container">
         <div className="content__top">
           <Categories value={categoryId} onClickCategory={onChangeCategory} />
-          <Sort />
+          <Sort value={sort}/>
         </div>
         <h2 className="content__title">All pizzas</h2>
         <div className="content__items">

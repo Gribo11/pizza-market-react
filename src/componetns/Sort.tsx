@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   selectSort,
   setSort,
+  Sort,
   SortPropertyEnum,
 } from "../redux/slices/filterSlice";
 
@@ -18,8 +19,11 @@ export const sortList: SortItem[] = [
   { name: "A-z", type: SortPropertyEnum.TITLE },
 ];
 
-function SortPopup() {
-  const sort = useSelector(selectSort);
+type SortPopoupProps = {
+  value: Sort;
+};
+
+const SortPopup: React.FC<SortPopoupProps> = React.memo(({ value }) => {
   const dispatch = useDispatch();
   const sortRef = React.useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
@@ -55,7 +59,7 @@ function SortPopup() {
           />
         </svg>
         <b>Sort by:</b>
-        <span onClick={() => setOpen(!open)}>{sort.name}</span>
+        <span onClick={() => setOpen(!open)}>{value.name}</span>
       </div>
       {open && (
         <div className="sort__popup">
@@ -63,7 +67,7 @@ function SortPopup() {
             {sortList.map((item, index) => {
               return (
                 <li
-                  className={sort.type === item.type ? "active" : ""}
+                  className={value.type === item.type ? "active" : ""}
                   onClick={() => onClickSort(item)}
                   key={index}
                 >
@@ -76,6 +80,6 @@ function SortPopup() {
       )}
     </div>
   );
-}
+});
 
 export default SortPopup;

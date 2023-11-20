@@ -3,10 +3,24 @@ import { Link } from "react-router-dom";
 import Search from "../componetns/Search";
 import { useSelector } from "react-redux";
 import { selectCart } from "../redux/slices/cartSlice";
+import React from "react";
 
 function Header() {
   const { items, totalPrice } = useSelector(selectCart);
-  const totatCount = items.reduce((sum:number, item:any) => sum + item.count, 0);
+  const totatCount = items.reduce(
+    (sum: number, item: any) => sum + item.count,
+    0
+  );
+  const isMounted = React.useRef(false);
+
+  React.useEffect(() => {
+    if (isMounted.current) {
+      const json = JSON.stringify(items);
+      window.localStorage.setItem("cart", json);
+    }
+    isMounted.current = true;
+  }, [items]);
+
   return (
     <div className="header">
       <div className="container">
